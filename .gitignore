@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/.angular/
+.env
+.env.*
+!.env.example
+**/appsettings.*.json
+!**/appsettings.json
+TestResults/
+
+.DS_Store

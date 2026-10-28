@@ -1,0 +1,265 @@
+<div class="page-heading">
+  <span class="eyebrow">DA2 / DEMO DE DESPLIEGUE</span>
+  <h1>
+    {{ page === 'register' ? 'Tu aura empieza acá.' : page === 'login' ? 'Volvé
+    a la arena.' : page === 'battle' ? 'El duelo está preparado.' : page ===
+    'organizer' ? 'Registrar batalla de demo' : 'Una copa. Dos jugadores.' }}
+  </h1>
+  <p>
+    {{ page === 'register' ? 'Creá tu jugador y sumate a tu primera copa.' :
+    page === 'login' ? 'Iniciá sesión para continuar la demostración.' : page
+    === 'battle' ? 'Una ronda generada, una decisión guardada en la base de
+    datos.' : 'Copa de demostración · Sin skills obligatorias · ELO inicial
+    1200' }}
+  </p>
+</div>
+<p class="alert error" role="alert" *ngIf="error">{{error}}</p>
+<p class="alert success" role="status" *ngIf="notice">{{notice}}</p>
+<p class="loading" role="status" *ngIf="busy">Procesando…</p>
+<form
+  class="card auth"
+  *ngIf="page==='register'"
+  [formGroup]="form"
+  (ngSubmit)="register()"
+>
+  <div class="card-top">
+    <span class="step">01</span>
+    <h2>Crear jugador</h2>
+    <span class="badge">1200 ELO</span>
+  </div>
+  <div class="form-grid">
+    <label
+      >Nombre<input
+        formControlName="name"
+        autocomplete="given-name"
+        maxlength="100"
+        [attr.aria-invalid]="invalid('name')"
+      /><small class="field-error" *ngIf="invalid('name')"
+        >Ingresá tu nombre (1 a 100 caracteres).</small
+      ></label
+    >
+    <label
+      >Apellido<input
+        formControlName="surname"
+        autocomplete="family-name"
+        maxlength="25"
+        [attr.aria-invalid]="invalid('surname')"
+      /><small class="field-error" *ngIf="invalid('surname')"
+        >Entre 3 y 25 caracteres, sin espacios al inicio o final.</small
+      ></label
+    >
+    <label class="wide"
+      >Email<input
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        maxlength="254"
+        [attr.aria-invalid]="invalid('email')"
+      /><small class="field-error" *ngIf="invalid('email')"
+        >Ingresá un email válido.</small
+      ></label
+    >
+    <label
+      >Nickname<input
+        formControlName="nickname"
+        autocomplete="username"
+        maxlength="20"
+        [attr.aria-invalid]="invalid('nickname')"
+      /><small>3–20 letras o números, sin espacios.</small
+      ><small class="field-error" *ngIf="invalid('nickname')"
+        >El nickname no cumple el formato.</small
+      ></label
+    >
+    <label
+      >Fecha de nacimiento<input
+        type="date"
+        formControlName="birthDate"
+        autocomplete="bday"
+        [attr.aria-invalid]="invalid('birthDate')"
+      /><small class="field-error" *ngIf="invalid('birthDate')"
+        >Debés tener al menos 13 años.</small
+      ></label
+    >
+    <label class="wide"
+      >Contraseña<input
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        maxlength="25"
+        [attr.aria-invalid]="invalid('password')"
+      /><small>15–25 caracteres: mayúscula, minúscula, número y símbolo.</small
+      ><small class="field-error" *ngIf="invalid('password')"
+        >Revisá los requisitos de la contraseña.</small
+      ></label
+    >
+  </div>
+  <button class="primary full" [disabled]="busy">
+    Crear mi jugador <span>↗</span>
+  </button>
+  <p class="form-footer">
+    ¿Ya tenés cuenta? <a routerLink="/login">Iniciá sesión</a>
+  </p>
+</form>
+<form
+  class="card auth compact"
+  *ngIf="page==='login'"
+  [formGroup]="loginForm"
+  (ngSubmit)="login()"
+>
+  <div class="card-top">
+    <span class="step">01</span>
+    <h2>Iniciar sesión</h2>
+  </div>
+  <p class="alert success" *ngIf="registered()" role="status">
+    Jugador creado. Iniciá sesión para inscribirte.
+  </p>
+  <label
+    >Email<input
+      type="email"
+      formControlName="email"
+      autocomplete="username"
+    /><small
+      class="field-error"
+      *ngIf="loginForm.controls.email.touched && loginForm.controls.email.invalid"
+      >Ingresá un email válido.</small
+    ></label
+  >
+  <label
+    >Contraseña<input
+      type="password"
+      formControlName="password"
+      autocomplete="current-password"
+    /><small
+      class="field-error"
+      *ngIf="loginForm.controls.password.touched && loginForm.controls.password.invalid"
+      >Ingresá tu contraseña.</small
+    ></label
+  >
+  <button class="primary full" [disabled]="busy">
+    Entrar a la arena <span>↗</span>
+  </button>
+  <p class="form-footer">
+    ¿Primera vez? <a routerLink="/registro">Creá tu jugador</a>
+  </p>
+</form>
+<section class="tournament-grid" *ngIf="tournament as t">
+  <article class="card copa">
+    <div class="card-top">
+      <span class="step">02</span><span class="badge">{{t.status}}</span>
+    </div>
+    <div class="aura-mark" aria-hidden="true">✦</div>
+    <span class="eyebrow">FARMEORT / TEMPORADA DEMO</span>
+    <h2>{{t.name}}</h2>
+    <p>Dos jugadores. Una batalla de aura.<br />Sin skills obligatorias.</p>
+    <div class="metrics">
+      <div>
+        <strong>{{t.players.length}} / {{t.capacity}}</strong
+        ><small>JUGADORES</small>
+      </div>
+      <div><strong>1</strong><small>RONDA DE DEMO</small></div>
+    </div>
+  </article>
+  <article class="card roster">
+    <div class="card-top">
+      <h2>Jugadores inscriptos</h2>
+      <button
+        type="button"
+        class="text-button"
+        (click)="refresh()"
+        [disabled]="busy"
+      >
+        Actualizar
+      </button>
+    </div>
+    <div class="player" *ngFor="let p of t.players; let i=index">
+      <span class="avatar">{{p.nickname.slice(0,1)}}</span>
+      <div>
+        <strong>{{p.nickname}}</strong><small>Inscripción aceptada</small>
+      </div>
+      <span class="elo">{{p.elo}} ELO</span>
+    </div>
+    <div class="empty-slot" *ngIf="t.players.length<2">
+      + Un lugar espera por tu aura
+    </div>
+    <ng-container *ngIf="page==='tournament'"
+      ><p class="muted" *ngIf="joined">
+        Ya estás inscripto. Cerrá sesión e ingresá con el organizador para
+        generar la ronda.
+      </p>
+      <button
+        class="primary full"
+        *ngIf="!joined && api.user?.role==='Jugador'"
+        (click)="join()"
+        [disabled]="busy || t.status!=='Abierto' || t.players.length>=t.capacity"
+      >
+        {{t.players.length>=t.capacity?'Cupo completo':'Inscribirme en la
+        copa'}} <span>↗</span></button
+      ><a
+        class="button primary full"
+        routerLink="/organizador"
+        *ngIf="api.user?.role==='Organizador'"
+        >Ir a generar ronda ↗</a
+      ></ng-container
+    >
+    <ng-container *ngIf="page==='organizer'"
+      ><p class="muted">
+        La generación crea la ronda y su batalla en una transacción. Quien tenga
+        mayor ELO comienza; un empate se decide al azar.
+      </p>
+      <button
+        class="primary full"
+        (click)="generate()"
+        [disabled]="busy || t.players.length!==2 || t.organizerId!==api.user?.id"
+      >
+        {{t.battleId?'Ver batalla registrada':'Generar ronda y registrar
+        batalla'}} <span>↗</span></button
+      ><small *ngIf="t.players.length!==2"
+        >Se necesitan dos inscripciones aceptadas.</small
+      ></ng-container
+    >
+    <a
+      class="detail-link"
+      *ngIf="t.battleId"
+      [routerLink]="['/batalla',t.battleId]"
+      >Ver detalle persistido →</a
+    >
+  </article>
+</section>
+<article class="card battle" *ngIf="battle as b">
+  <div class="card-top">
+    <span class="eyebrow">{{b.tournament}} · RONDA {{b.round}}</span
+    ><span class="badge">{{b.status}}</span>
+  </div>
+  <div class="versus">
+    <div>
+      <span class="avatar large">{{b.playerOne.nickname.slice(0,1)}}</span>
+      <h2>{{b.playerOne.nickname}}</h2>
+      <p>{{b.playerOne.elo}} ELO inicial</p>
+    </div>
+    <span class="vs">VS</span>
+    <div>
+      <span class="avatar large rival"
+        >{{b.playerTwo.nickname.slice(0,1)}}</span
+      >
+      <h2>{{b.playerTwo.nickname}}</h2>
+      <p>{{b.playerTwo.elo}} ELO inicial</p>
+    </div>
+  </div>
+  <div class="starter">
+    <span>PRIMER TURNO</span><strong>✦ {{starter}}</strong
+    ><small>La elección quedó persistida al crear la batalla.</small>
+  </div>
+  <dl>
+    <dt>Identificador de batalla</dt>
+    <dd>{{b.id}}</dd>
+    <dt>Torneo</dt>
+    <dd>{{b.tournamentId}}</dd>
+    <dt>Ronda</dt>
+    <dd>{{b.round}}</dd>
+  </dl>
+  <a
+    class="detail-link"
+    [routerLink]="api.user?.role==='Organizador'?'/organizador':'/torneo'"
+    >← Volver al torneo</a
+  >
+</article>

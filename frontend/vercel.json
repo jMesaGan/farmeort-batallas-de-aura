@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "dist/farmeort/browser",
+  "rewrites": [
+    {
+      "source": "/((?!.*\\.).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "installCommand": "npm ci --engine-strict=false"
+}
